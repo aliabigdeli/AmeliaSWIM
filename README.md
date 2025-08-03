@@ -178,6 +178,11 @@ Once copied it can be pasted in a notepad to create a csv file
 
 <hr>
 
+## Ethics Statement
+
+Amelia is compliant with the FAA Terms of Service for data redistribution as well as the privacy and safety filters imposed by the FAA. Although the Amelia dataset is based on the FAA SWIM data, Amelia is NOT official FAA data and is not suitable for operational purposes. Amelia should only be used for research purposes. Our collection methodology comes with inherent limitations, such as noise in ground radar as well as noisy labelling of agents in the dataset.
+
+
 ## BibTeX
 
 If you find our work useful in your research, please cite us!
