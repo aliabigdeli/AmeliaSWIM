@@ -1,4 +1,5 @@
-from amelia_swim.download_raw import MinioFileDownloader
+# from amelia_swim.download_raw import MinioFileDownloader
+from amelia_swim.download_raw import SwiftFileDownloader
 from hydra.utils import instantiate
 import hydra
 import logging
@@ -96,7 +97,7 @@ class Data:
 
         # download the raw data
         if cfg.data.download:
-            downloader = MinioFileDownloader()
+            downloader = SwiftFileDownloader(cfg.data.base_url)
             # some constant padding
             downloader.download_files(
                 cfg.data.start_time - 3700, cfg.data.end_datetime + 3700,

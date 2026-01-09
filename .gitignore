@@ -170,3 +170,8 @@ cython_debug/
 **.DS_Store
 # VS Code
 .vscode
+
+datasets
+!datasets/.gitkeep
+
+**.lock
