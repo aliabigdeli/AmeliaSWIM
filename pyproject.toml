@@ -7,7 +7,7 @@ name = "amelia_swim"
 version = "1.0.0"
 description = "Tools for Amelia dataset analysis."
 readme = {file = "README.md", content-type = "text/markdown"}
-requires-python = ">=3.9, <4.0"
+requires-python = "==3.9.*"
 dependencies = [
     'setuptools',
     'tqdm==4.65.0',
@@ -15,13 +15,14 @@ dependencies = [
     'numpy==1.21.2',
     'pykml',
     'easydict==1.10',
-    'pandas==2.0.3',
+    'pandas==1.5.2',
     'hydra-core==1.3.2',
     'hydra_colorlog==1.2.0',
     'geographiclib==2.0',
     'joblib==1.2.0',
     'shapely==2.0.3',
-    'python-dateutil==2.9.0'
+    'python-dateutil==2.9.0',
+    "requests>=2.32.4",
 ]
 
 authors = [
@@ -32,6 +33,8 @@ authors = [
     {name = "Jong Hoon Park"},
 ]
 
+[tool.setuptools.packages.find]
+include = ["amelia_swim"]
 
 
 [project.urls]

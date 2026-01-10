@@ -59,22 +59,19 @@ To download and convert trajectory data for any of the 42 airports in the [Ameli
 The raw SWIM SMES `.njson.gz` files can be downloaded using the following script:
 
 ```bash
-python download_raw.py --endpoint <minio-endpoint> \
-                       --bucket <bucket-name> \
-                       --start_time <start-time> \
+python download_raw.py --start_time <start-time> \
                        --end_time <end-time> \
                        --destination <destination>
+
 ```
 
 Where:
 
-- `<minio-endpoint>`: MinIO server endpoint. By default, this is set to `airlab-share-01.andrew.cmu.edu:9000`.
-- `<bucket-name>`: Name of the bucket to download files from. By default, this is set to `ameliaswim`.
-- `<start-time>`: The start time in the format `YYYY-MM-DD HH:MM:SS`. By default it is set to `2023-01-01 00:00:00`.
-- `<end_time>`: The end time in the format `YYYY-MM-DD HH:MM:SS`. By default it is set to `2023-01-02 00:00:00`.
+- `<start-time>`: The start time in UTC in the format `YYYY-MM-DD HH:MM:SS`. By default it is set to `2023-01-01 00:00:00`.
+- `<end_time>`: The end time in UTC in the format `YYYY-MM-DD HH:MM:SS`. By default it is set to `2023-01-02 00:00:00`.
 - `<destination>`: Local directory to save the downloaded files. By default it is set to `swim_data/`.
 
-This will download the raw files from the MinIO server and save them in the specified destination directory.
+This will download the raw files from the public OpenStack Swift dataset and save them in the specified destination directory.
 
 
 ### Process Data (convert files from njson to csv)

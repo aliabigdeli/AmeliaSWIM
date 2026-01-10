@@ -1,4 +1,4 @@
-from download_raw import MinioFileDownloader
+from download_raw import SwiftFileDownloader
 from hydra.utils import instantiate
 import hydra
 import logging
@@ -96,7 +96,7 @@ class Data:
 
         # download the raw data
         if cfg.data.download:
-            downloader = MinioFileDownloader()
+            downloader = SwiftFileDownloader(cfg.data.base_url)
             # some constant padding
             downloader.download_files(
                 cfg.data.start_time - 3700, cfg.data.end_datetime + 3700,
@@ -217,13 +217,13 @@ class Data:
         # Parallel setting
         cores = self.cfg.data.n_jobs
         if cores == -1:
-            cores   = os.cpu_count()
-        io_cores    = cores // 2
+            cores = os.cpu_count()
+        io_cores = cores // 2
         chunk_cores = cores // 2
         print(f"\033[1;34m [ INFO ] Using {cores} cores for processing\033[0m")
         print(f"\033[1;34m [ INFO ] Using {io_cores} cores for IO\033[0m")
         print(f"\033[1;34m [ INFO ] Using {chunk_cores} cores for chunking\033[0m")
-        
+
         while self.end_datetime - self.start_time >= 100:
             log.info(
                 "Currently processing from %s to %s",

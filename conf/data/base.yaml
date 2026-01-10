@@ -1,7 +1,9 @@
-datapath: "/ocean/projects/cis220039p/mdt2/datasets/boeing"
-outpath: "out_data/amelia42"
+
+base_url: "https://airlab-cloud.andrew.cmu.edu:8080/swift/v1/AUTH_ac8533a83cff4d48bc8c608ad222d330/amelia_swim/"
+datapath: "datasets/amelia/raw_swim"
+outpath: "datasets/amelia/raw_data"
 window: 3600 ##sec
 n_jobs: -1 #num cpus
 parallel: True
-download: False
+download: True
 overwrite: False

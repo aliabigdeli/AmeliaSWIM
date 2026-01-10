@@ -77,4 +77,5 @@ dependencies:
   - zlib=1.2.13=h4ab18f5_6
   - zstandard=0.22.0=py311h2c38b39_0
   - zstd=1.5.5=hc292b87_2
+  - requests=2.32.5=pyhd8ed1ab_0
 prefix: /lustre/fsw/portfolios/nvr/users/jpatrikar/anaconda3/envs/swim

@@ -1,29 +1,29 @@
+from joblib import Parallel, delayed, parallel_backend
+from shapely.geometry.polygon import Polygon
+from geographiclib.geodesic import Geodesic
+from download_raw import SwiftFileDownloader
+from omegaconf import DictConfig
+from collections import defaultdict
+from shapely.geometry import Point
+from glob import glob
+import xml.etree.ElementTree as ET
+from tqdm import tqdm
+import pandas as pd
+import numpy as np
+import collections
+import datetime
+import warnings
+import logging
+import gzip
+import hydra
+import json
+import copy
+import ast
+import re
 import os
 # To avoid CPU overload
 os.environ["PYTHONWARNINGS"] = "ignore"
-import re
-import ast
-import copy
-import json
-import hydra
-import gzip
-import logging
-import warnings
-import datetime
-import collections
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
-import xml.etree.ElementTree as ET
 
-from glob import glob
-from shapely.geometry import Point
-from collections import defaultdict
-from omegaconf import DictConfig
-from download_raw import MinioFileDownloader
-from geographiclib.geodesic import Geodesic
-from shapely.geometry.polygon import Polygon
-from joblib import Parallel, delayed, parallel_backend
 
 warnings.filterwarnings("ignore")
 
@@ -97,7 +97,7 @@ class Data:
 
         # download the raw data
         if cfg.data.download:
-            downloader = MinioFileDownloader()
+            downloader = SwiftFileDownloader(cfg.data.base_url)
             # some constant padding
             downloader.download_files(
                 cfg.data.start_time - 3700, cfg.data.end_datetime + 3700,
@@ -215,9 +215,9 @@ class Data:
         return data
 
     def _process_window(
-        self, 
-        window_id: int, 
-        start_time: int, 
+        self,
+        window_id: int,
+        start_time: int,
         end_time: int
     ):
         log.info(
@@ -341,7 +341,6 @@ class Data:
             csv_file = f"{self.outpath}/{self.airport}_{polygon_num}_{window_id}_{start_time}.csv"
             tmp_df.to_csv(csv_file, index=False)
 
-
     def process_data(self):
         # Configure setting for parallel processing
         cores = self.cfg.data.n_jobs
@@ -354,24 +353,24 @@ class Data:
         print(f"\033[1;34m [ INFO ] Using {cores} cores for processing\033[0m")
         print(f"\033[1;34m [ INFO ] Using {self.io_cores} cores for IO\033[0m")
         print(f"\033[1;34m [ INFO ] Using {self.chunk_cores} cores for chunking\033[0m")
-        
+
         # Create time chunks
-        windows: list[tuple[int,int,int]] = []          # (win_id, start_ts, end_ts)
-        start_ts, end_ts   = self.start_time, self.end_time
-        win_id             = 1
+        windows: list[tuple[int, int, int]] = []          # (win_id, start_ts, end_ts)
+        start_ts, end_ts = self.start_time, self.end_time
+        win_id = 1
         while self.end_datetime - start_ts >= 100:      # same termination crit.
             windows.append((win_id, start_ts, end_ts))
-            start_ts  += self.cfg.data.window
-            end_ts    += self.cfg.data.window
-            win_id    += 1
-        
+            start_ts += self.cfg.data.window
+            end_ts += self.cfg.data.window
+            win_id += 1
+
         # breakpoint()
         with parallel_backend("loky", n_jobs=self.chunk_cores):
             Parallel(n_jobs=self.chunk_cores)(
                 delayed(self._process_window)(win_id, start_ts, end_ts) for win_id, start_ts, end_ts in windows
             )
         log.info("Processing complete.")
-           
+
     def get_range_and_bearing(self, lat1, lon1, lat2, lon2):
 
         lat2 = float(lat2)
