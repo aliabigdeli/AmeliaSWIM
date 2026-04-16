@@ -294,12 +294,24 @@ class Data:
             df["Heading"] = df.groupby("ID")["Heading"].transform(unwrap_with_nans)
             df["Heading"] = np.rad2deg(df["Heading"])
 
-            for field in ["Altitude", "Speed", "Heading", "Type", "Lat", "Lon"]:
+            for field in ["Altitude", "Speed", "Heading", "Lat", "Lon"]:
                 df[field] = (
                     df[field]
                     .groupby("ID")
                     .apply(lambda group: group.interpolate(limit_direction="both"))
                 )
+
+            # Type is categorical — fill with per-agent majority, then ffill/bfill for gaps
+            dominant_type = df["Type"].groupby("ID").transform(
+                lambda g: g.mode().iloc[0] if g.notna().any() else np.nan
+            )
+            df["Type"] = df["Type"].fillna(dominant_type)
+            df["Type"] = (
+                df["Type"]
+                .groupby("ID")
+                .apply(lambda g: g.ffill().bfill())
+            )
+            df["Type"] = df["Type"].round().astype("Int64")
 
             for field in ["Lat", "Lon"]:
                 df[field] = (
