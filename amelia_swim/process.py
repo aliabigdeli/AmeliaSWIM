@@ -1,4 +1,7 @@
-from download_raw import SwiftFileDownloader
+try:  # imported as an installed package
+    from amelia_swim.download_raw import SwiftFileDownloader
+except ImportError:  # run as a script from inside amelia_swim/
+    from download_raw import SwiftFileDownloader
 from hydra.utils import instantiate
 import hydra
 import logging
@@ -285,7 +288,9 @@ class Data:
             del df["datetime"]
             df = df.sort_values(by="datetime")
             # interpolation
-            df = df.groupby("ID").resample("S").mean()
+            # numeric_only: pandas >= 2.0 raises on the string Time/Date columns
+            # instead of silently dropping them (they are not used downstream).
+            df = df.groupby("ID").resample("S").mean(numeric_only=True)
             df["Interp"] = df["Lat"].apply(new_column_value)
             # save a ckpt csv for testing
             # df.to_csv('test_after_groupby.csv')
@@ -297,18 +302,18 @@ class Data:
             for field in ["Altitude", "Speed", "Heading", "Type", "Lat", "Lon"]:
                 df[field] = (
                     df[field]
-                    .groupby("ID")
+                    .groupby("ID", group_keys=False)
                     .apply(lambda group: group.interpolate(limit_direction="both"))
                 )
 
             for field in ["Lat", "Lon"]:
                 df[field] = (
-                    df[field].groupby("ID").apply(
+                    df[field].groupby("ID", group_keys=False).apply(
                         lambda group: group.interpolate(limit_direction="both", limit=10))
                 )
 
             for field in ["Altitude", "Speed", "Heading", "Lat", "Lon"]:
-                df[field] = (df[field].groupby("ID").apply(
+                df[field] = (df[field].groupby("ID", group_keys=False).apply(
                     lambda group: group.rolling(5, min_periods=1, center=True).mean())
                 )
             # Angle Wrap
@@ -329,12 +334,15 @@ class Data:
             # geo filters
             df = df[df["Altitude"] < self.max_alt]
 
+            # The frame index holds naive UTC timestamps (parsed straight out of
+            # the SMES XML), so the slice bounds must be naive UTC too: pandas >= 2.0
+            # refuses to compare tz-aware bounds against a tz-naive index.
             start = datetime.datetime.fromtimestamp(
                 self.start_time, tz=datetime.timezone.utc
-            )
+            ).replace(tzinfo=None)
             end = datetime.datetime.fromtimestamp(
                 self.end_time, tz=datetime.timezone.utc
-            )
+            ).replace(tzinfo=None)
 
             # For every polygon (fence) check if the point is inside
             for polygon_num in polygons_to_process:

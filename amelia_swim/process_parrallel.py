@@ -1,7 +1,10 @@
 from joblib import Parallel, delayed, parallel_backend
 from shapely.geometry.polygon import Polygon
 from geographiclib.geodesic import Geodesic
-from download_raw import SwiftFileDownloader
+try:  # imported as an installed package
+    from amelia_swim.download_raw import SwiftFileDownloader
+except ImportError:  # run as a script from inside amelia_swim/
+    from download_raw import SwiftFileDownloader
 from omegaconf import DictConfig
 from collections import defaultdict
 from shapely.geometry import Point

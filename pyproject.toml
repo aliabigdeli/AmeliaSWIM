@@ -7,7 +7,7 @@ name = "amelia_swim"
 version = "1.0.0"
 description = "Tools for Amelia dataset analysis."
 readme = {file = "README.md", content-type = "text/markdown"}
-requires-python = "==3.9.*"
+requires-python = ">=3.9"
 dependencies = [
     'setuptools',
     'tqdm==4.65.0',
@@ -35,6 +35,20 @@ authors = [
 
 [tool.setuptools.packages.find]
 include = ["amelia_swim"]
+
+# Ship the airport geofences and hydra configs inside the wheel so the processor
+# is usable from an installed package, not just from a source checkout. `conf/`
+# is kept as data rather than a subpackage, so locate it with
+# importlib.resources.files("amelia_swim") / "conf".
+# conf/qgist is deliberately excluded: 45 MB of QGIS project files that nothing
+# imports at runtime.
+[tool.setuptools.package-data]
+amelia_swim = [
+    "conf/*.yaml",
+    "conf/airports/*.yaml",
+    "conf/data/**/*.yaml",
+    "conf/fences/*.csv",
+]
 
 
 [project.urls]
